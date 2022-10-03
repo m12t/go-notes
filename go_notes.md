@@ -67,3 +67,16 @@
     }
     ```
     - Perhaps worse, is if the value of `cwd` _is_ referenced locally, causing no compiler error about an unused variable. This is a tough bug to catch since it is silent and you would need to check the value of `cwd` to see that it wasn't modified as it should have been.
+
+## Basic Data Types (3)
+- there are 4 categories of types in Go:
+1. Basic types
+    - numbers, strings, booleans
+2. aggregate types
+    - arrays and structs
+    - form complex data types of combining values of several basic types
+3. reference types
+    - pointers, slices, maps, functions, channels
+    - refer to program variables or state _indirectly_. The effect of an operation is thus applied to all copies of the reference
+4. interface types
+
