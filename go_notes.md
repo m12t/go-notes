@@ -80,3 +80,8 @@
     - refer to program variables or state _indirectly_. The effect of an operation is thus applied to all copies of the reference
 4. interface types
 
+### Strings
+- Strings are immutable. This means that copying and a string of any length or taking a substring are cheap because they can safely point to the same location in memory.
+- String literals are written with backticks (\`...\`) and no escape processing is performed other than elimination of carriage returns `\r`.
+- ASCII (7 bits) was the original character set, but it couldn't support all languages and symbols we use today. Today, Unicode is used (`int32`, aka `rune` in Go). However, using 32 bits is wasteful for nearly all cases. Enter, UTF-8, a variable length encoding of Unicode.
+- Converting an integer to a string as in `string(65)` will return the UTF-8 value of the integer interpreted as a rune. Eg. `fmt.Println(string(65))` will retun `A`, not `65`.
