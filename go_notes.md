@@ -85,3 +85,128 @@
 - String literals are written with backticks (\`...\`) and no escape processing is performed other than elimination of carriage returns `\r`.
 - ASCII (7 bits) was the original character set, but it couldn't support all languages and symbols we use today. Today, Unicode is used (`int32`, aka `rune` in Go). However, using 32 bits is wasteful for nearly all cases. Enter, UTF-8, a variable length encoding of Unicode.
 - Converting an integer to a string as in `string(65)` will return the UTF-8 value of the integer interpreted as a rune. Eg. `fmt.Println(string(65))` will retun `A`, not `65`.
+
+
+
+## Constants
+- untyped constants have much greater precision than any of the basic types available.
+
+## Arrays
+- questions about index value pair arrays. How are these stored in memory? linked list? hashmap? array of alternating addresses? Is the index required to be an int? if so, maybe the array creation is just slower and the ordering is based on what is specified in the creation.
+- The following example is interesting because it gives the best of both properties, arrays, and hashmaps in having fast iteration and fast indexing, while having lookup ability.
+```go
+type Currency int
+
+const (
+    USD Currency = iota
+    EUR
+    GBP
+    RMB
+)
+
+symbol := [...]string{USD: "$", EUR: "E", GBP: "G", RMB: "R"}
+
+fmt.Println(USD, "USD:", symbol[USD])
+
+```
+
+
+## Slices (4.2)
+- a lightweight data structure that gives access to some or all elements of an array, known as the slice's underlying array
+- can be created with `s = make([]byte)`
+- a slice has 3 components:
+    1. A pointer to the first elemen in the array that is reachable to the slice
+    2. A capacity, typically the number of elements from the pointer to the end of the array (why only typically? what other options)
+    3. A length, the number of elements in the slice. *This cannot exceed capacity*
+- stlicing beyong the capacity of the slice induces a panic. Slicing beyond the length of the underlying array extends the slice, allowing for it to be longer than the original.
+- Unlike arrays, slices are *not* comparable. In fact, the only allowed slice comparison is with `nil` since this is the zero value of a slice. To test if a slice is empty, use `len(s) == 0`, not `s == nil` because the following slices are all empty (and have len(s) == 0) but one of them is not nil:
+    ```go
+        var s []int    // len(s) == 0, s == nil
+        s = nil        // len(s) == 0, s == nil
+        s = []int(nil) // len(s) == 0, s == nil
+        s = []int{}    // len(s) == 0, s != nil
+    ```
+- appending to a slice gives amortized constant time since there is a growth factor used on the underlying array so that a new allocation is only needed periodically, with most calls to append simply extending the slice, not copying an array in memory. However, becasue of the unknown nature of when a growth is performed, it isn't safe to access an old slice after an append. Because of this, it's good practice to append to the same name, like `names = append(names, "Michael")`. This is not only for append, but for any function that may change the length or capacity of a slice, or make it point to a different underlying array.
+
+
+
+## Functions:
+- a _variadic_ function accepts a varying number of final inputs. The notation is the following:
+    ```go
+
+    func addNums(x []int, y...int) []int {
+    }
+    ```
+
+
+## Maps (4.3)
+- A reference to a hashmap
+- Can be created with `make` like `table := make(map[K]V)` where k is the key type and v is the value type
+- key and value types don't need to match, but all keys must be of the same type and all values must be of the same type.
+- keys must be comparable, so slices don't work as keys, and floats are a bad choice for this reason.
+- map lookups are always safe, so calling `delete()` on an item not in a map is safe because the behavior of attempting to access a key not within a map is that the zero value of the type is returned.
+- To know whether a value was in the map, there is a multiple return on access: `age, ok := ages["bob"]` if the key is not in the map, the value will be zero but the `ok` bool will be `false`
+- however, storing to a `nil` map causes a panic. if `ages == nil`, `ages["Freddy"] = 100` will panic. You must allocate a map before being able to store to it.
+- enumerating the key value pairs of a map is done with `range` like `for key, value := range myMap { fmt.Println(key, value) }`
+
+
+## Constants
+- untyped constants have much greater precision than any of the basic types available.
+
+## Arrays
+- questions about index value pair arrays. How are these stored in memory? linked list? hashmap? array of alternating addresses? Is the index required to be an int? if so, maybe the array creation is just slower and the ordering is based on what is specified in the creation.
+- The following example is interesting because it gives the best of both properties, arrays, and hashmaps in having fast iteration and fast indexing, while having lookup ability.
+```go
+type Currency int
+
+const (
+    USD Currency = iota
+    EUR
+    GBP
+    RMB
+)
+
+symbol := [...]string{USD: "$", EUR: "E", GBP: "G", RMB: "R"}
+
+fmt.Println(USD, "USD:", symbol[USD])
+
+```
+
+
+## Slices (4.2)
+- a lightweight data structure that gives access to some or all elements of an array, known as the slice's underlying array
+- can be created with `s = make([]byte)`
+- a slice has 3 components:
+    1. A pointer to the first elemen in the array that is reachable to the slice
+    2. A capacity, typically the number of elements from the pointer to the end of the array (why only typically? what other options)
+    3. A length, the number of elements in the slice. *This cannot exceed capacity*
+- stlicing beyong the capacity of the slice induces a panic. Slicing beyond the length of the underlying array extends the slice, allowing for it to be longer than the original.
+- Unlike arrays, slices are *not* comparable. In fact, the only allowed slice comparison is with `nil` since this is the zero value of a slice. To test if a slice is empty, use `len(s) == 0`, not `s == nil` because the following slices are all empty (and have len(s) == 0) but one of them is not nil:
+    ```go
+        var s []int    // len(s) == 0, s == nil
+        s = nil        // len(s) == 0, s == nil
+        s = []int(nil) // len(s) == 0, s == nil
+        s = []int{}    // len(s) == 0, s != nil
+    ```
+- appending to a slice gives amortized constant time since there is a growth factor used on the underlying array so that a new allocation is only needed periodically, with most calls to append simply extending the slice, not copying an array in memory. However, becasue of the unknown nature of when a growth is performed, it isn't safe to access an old slice after an append. Because of this, it's good practice to append to the same name, like `names = append(names, "Michael")`. This is not only for append, but for any function that may change the length or capacity of a slice, or make it point to a different underlying array.
+
+
+
+## Functions:
+- a _variadic_ function accepts a varying number of final inputs. The notation is the following:
+    ```go
+
+    func addNums(x []int, y...int) []int {
+    }
+    ```
+
+
+## Maps (4.3)
+- A reference to a hashmap
+- Can be created with `make` like `table := make(map[K]V)` where k is the key type and v is the value type
+- key and value types don't need to match, but all keys must be of the same type and all values must be of the same type.
+- keys must be comparable, so slices don't work as keys, and floats are a bad choice for this reason.
+- map lookups are always safe, so calling `delete()` on an item not in a map is safe because the behavior of attempting to access a key not within a map is that the zero value of the type is returned.
+- To know whether a value was in the map, there is a multiple return on access: `age, ok := ages["bob"]` if the key is not in the map, the value will be zero but the `ok` bool will be `false`
+- however, storing to a `nil` map causes a panic. if `ages == nil`, `ages["Freddy"] = 100` will panic. You must allocate a map before being able to store to it.
+- enumerating the key value pairs of a map is done with `range` like `for key, value := range myMap { fmt.Println(key, value) }`
