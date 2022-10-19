@@ -191,16 +191,6 @@ fmt.Println(USD, "USD:", symbol[USD])
 - appending to a slice gives amortized constant time since there is a growth factor used on the underlying array so that a new allocation is only needed periodically, with most calls to append simply extending the slice, not copying an array in memory. However, becasue of the unknown nature of when a growth is performed, it isn't safe to access an old slice after an append. Because of this, it's good practice to append to the same name, like `names = append(names, "Michael")`. This is not only for append, but for any function that may change the length or capacity of a slice, or make it point to a different underlying array.
 
 
-
-## Functions:
-- a _variadic_ function accepts a varying number of final inputs. The notation is the following:
-    ```go
-
-    func addNums(x []int, y...int) []int {
-    }
-    ```
-
-
 ## Maps (4.3)
 - A reference to a hashmap
 - Can be created with `make` like `table := make(map[K]V)` where k is the key type and v is the value type
@@ -210,3 +200,43 @@ fmt.Println(USD, "USD:", symbol[USD])
 - To know whether a value was in the map, there is a multiple return on access: `age, ok := ages["bob"]` if the key is not in the map, the value will be zero but the `ok` bool will be `false`
 - however, storing to a `nil` map causes a panic. if `ages == nil`, `ages["Freddy"] = 100` will panic. You must allocate a map before being able to store to it.
 - enumerating the key value pairs of a map is done with `range` like `for key, value := range myMap { fmt.Println(key, value) }`
+
+
+## Functions (5):
+- functions are _first class_ values in Go. Functions have types and can be assigned to variables, passed as arguments to other functions, or returned from other functions.
+- a _variadic_ function accepts a varying number of final inputs. The notation is the following:
+    ```go
+
+    func addNums(x []int, y...int) []int {
+    }
+    ```
+- go has no default arguments... explore the behavior of `append()` accepting nil as in page 123 of tgpl
+- a function can have named results, in which case they are variables initialized to the default value of their type.
+    - When named results are used, a "bare return" can be employed. This is where the function's return statement doesn't explicity list out the variables to return, instead relying on the prescribed named values in the function declaration.
+    - This  can make code more DRY and reduce errors where the returned values are modified and all return statements within the function must be updated.
+    - However, this also comes at the cost of readability.
+- The flow of a Go function typically follows a similar pattern:
+    - After checking an error, failure is usually dealt with before success. If failure causes the function to return, the logic for success is not indented within an else block but follows at the outer level. Functions tend to exhibit a com- mon structure, with a series of initial checks to reject errors, followed by the substance of the function at the end, minimally indented.
+- Functions are comparable to nil, but not comparable to other functions.
+    - This is because of "hidden variables" where functions store state. An example of this is a function that declares a local variable and then returns an anonymous function that acts on that local variable. Since anonymous functions have access to the entire lexical environment, the anonymous function will act on the declared local variable. See tgpl 5.6 (gopl.io/ch5/squares) for an in-depth example.
+- Iteration variable capture is when function values created within a loop "capture" a variable by using its memory location, not its value. This is a difficult bug to catch and often leads to strange patterns like assining a new variable to one of the same name to "pull-in" a local copy for usage, as in `dir := dir` within a loop. See tgpl 5.6.1
+### Errors (5.4)
+- Errors in Go are propogated using a multiple return.
+- By convention, if a function can error, the error is returned as another value, typically the last value.
+- If a function's error can only have one cause, it is typically retuned as a boolean, `ok`.
+- If a function can error on more than one cause, the customary return is `err`, a variable of type `error`. If no error is encountered, `nil` is used to signify success.
+### Defer (5.8)
+- The `defer` keyword is a prefix to a function or method call and it means that execution of that call will happen once the parent function finishes exeecuting, be that by a return statement, falling off, or panicking.
+- Any number of calls may be deferred. The order of execution of defered functions is the reverse order in which they were deferred. Think: stack data structure.
+- A defer statement is typically used to ensure that resources are closed regardless of what happens inside the function that opened the resource.
+    - It's customary to make the deferred call immediately after successful access of the resource.
+- `defer` can also be used when accessing mutexes. Eg. the mutex is unlocked, a defer call to lock the mutex is made, then operation(s) is/are performed and the rest of the funciton can safely return or fall off.
+### Panic (5.9)
+- A panic is when a runtime error is encountered in a Go program, such as a `nil` pointer dereference, or an out-of-bounds array read.
+- When Go panics, normal execution stops where the panic was generated, all defered function calls in that goroutine are executed, the program crashes with a log message.
+- Panics don't necessarily have to be generated by the runtime. Panics can also be raised in code by calling `panic()`, accepting any value as an argument.
+### Recover (5.10)
+- In most cases, a panic should cause the program to crash and execution to stop. However, there are times where this is undesirable. `recover()` allows normal execution to resume after a `panic` and captures the value returned by panic.
+- The function that panicked does not resume execution, rather, it returns normally and execution resumes with the calling function.
+- For many reasons, `recover()` should be used sparingly. Especially if the cause of the panic is a package or code you don't maintain.
+
