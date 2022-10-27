@@ -197,3 +197,8 @@ fmt.Println(USD, "USD:", symbol[USD])
 - In most cases, a panic should cause the program to crash and execution to stop. However, there are times where this is undesirable. `recover()` allows normal execution to resume after a `panic` and captures the value returned by panic.
 - The function that panicked does not resume execution, rather, it returns normally and execution resumes with the calling function.
 - For many reasons, `recover()` should be used sparingly. Especially if the cause of the panic is a package or code you don't maintain.
+
+
+### Structs
+- Structs can be "embedded" into other structs (4.4.3), giving access to the embedded struct's fields
+- 
