@@ -202,3 +202,8 @@ fmt.Println(USD, "USD:", symbol[USD])
 ### Structs
 - Structs can be "embedded" into other structs (4.4.3), giving access to the embedded struct's fields
 - 
+
+
+### Interface (7)
+- Interfaces are a mapping of methods to concrete types. In other words, interfaces are a named collection of method signatures for a type.
+- 
