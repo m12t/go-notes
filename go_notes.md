@@ -207,3 +207,11 @@ fmt.Println(USD, "USD:", symbol[USD])
 ### Interface (7)
 - Interfaces are a mapping of methods to concrete types. In other words, interfaces are a named collection of method signatures for a type.
 - 
+
+
+### concurrency
+- A data race is UB when 2 or more goroutines access the same variable and at least one of those is a write.
+- 3 ways to prevent data races:
+    1. never update (duh)
+    2. limit access to a single goroutine. Concurrency here is using channels to request access in a queue essentially. Access is still confined to a single goroutine.
+    3. use a lock/mutex to limit access to one single goroutine at a time.
