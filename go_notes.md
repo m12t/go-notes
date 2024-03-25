@@ -208,6 +208,10 @@ fmt.Println(USD, "USD:", symbol[USD])
 - Interfaces are a mapping of methods to concrete types. In other words, interfaces are a named collection of method signatures for a type.
 - 
 
+### channels
+- send operations on _unbuffered_ channels do block.
+- send operations on _buffered_ channels do NOT block, _unless_ the channel is full.
+
 
 ### concurrency
 - A data race is UB when 2 or more goroutines access the same variable and at least one of those is a write.
