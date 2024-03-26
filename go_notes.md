@@ -219,3 +219,6 @@ fmt.Println(USD, "USD:", symbol[USD])
     1. never update (duh)
     2. limit access to a single goroutine. Concurrency here is using channels to request access in a queue essentially. Access is still confined to a single goroutine.
     3. use a lock/mutex to limit access to one single goroutine at a time.
+- how does the Go runtime handle multiple calls to mutex.Unlock?? Is it a queue (FIFO)??
+- interesting pattern from Section 9.7 of TGPL where an unbuffered channel is created and passed into a function (actually it's packed into a struct and pushed onto a channel where it is later serviced by that channel's consumer), then the calling function immediately reads (blocking) from the channel it just created until the response it returned.
+
